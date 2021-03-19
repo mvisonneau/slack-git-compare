@@ -27,7 +27,7 @@ func (r Repository) Key() RepositoryKey {
 	return RepositoryKey(strconv.Itoa(int(crc32.ChecksumIEEE([]byte(r.ProviderType.String() + r.Name)))))
 }
 
-// Repositories holds multiple Repository index with their unique identifiers (RepositoryKey)
+// Repositories holds multiple Repository with their unique identifiers (RepositoryKey)
 type Repositories map[RepositoryKey]*Repository
 
 // RankedRepository can be used when fuzzy searching Repositories, attributing a "rank"
@@ -47,7 +47,7 @@ func (rs Repositories) GetByKey(k RepositoryKey) (r *Repository, ok bool) {
 }
 
 // Search looks up for repositories by Name in a fuzzy finding fashion, it will return
-// then sorted by pertinence
+// them sorted by pertinence
 func (rs Repositories) Search(filter string, limit int) (repos RankedRepositories) {
 	for _, r := range rs {
 		if len(filter) == 0 {
@@ -78,7 +78,7 @@ func (rs Repositories) Search(filter string, limit int) (repos RankedRepositorie
 }
 
 // GetByClosestNameMatch returns the Repository which is the most pertinent
-// given the Name
+// given its Name
 func (rs Repositories) GetByClosestNameMatch(name string) (repo *Repository) {
 	if len(name) == 0 {
 		return

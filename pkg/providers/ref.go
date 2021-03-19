@@ -8,6 +8,7 @@ import (
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
+// Ref holds details of a git reference
 type Ref struct {
 	Name   string
 	Type   RefType
@@ -18,24 +19,37 @@ type Ref struct {
 	OriginRef *Ref
 }
 
+// Refs holds multiple Ref with their unique identifiers (RefKey)
 type Refs map[RefKey]*Ref
 
+// RankedRef can be used when fuzzy searching Refs, attributing a "rank"
+// for the Ref given the pertinence of its attributes given the search
 type RankedRef struct {
 	*Ref
 	Rank int
 }
 
+// RankedRefs is a slice of *RankedRef
 type RankedRefs []*RankedRef
 
+// RefType represents the type of git reference
 type RefType uint8
 
 const (
+	// RefTypeBranch represent a git branch
 	RefTypeBranch RefType = iota
+
+	// RefTypeCommit represent a git commit
 	RefTypeCommit
+
+	// RefTypeEnvironment represent a git environment (only used for GitLab)
 	RefTypeEnvironment
+
+	// RefTypeTag represent a git tag
 	RefTypeTag
 )
 
+// String returns the type as a readable string
 func (rt RefType) String() string {
 	return [...]string{
 		"branch",
@@ -45,19 +59,22 @@ func (rt RefType) String() string {
 	}[rt]
 }
 
-// RefKey ..
+// RefKey is a unique identifier for a Ref
 type RefKey string
 
-// Key ..
+// Key returns a unique identifier based upon the Type and Name  of the Ref
 func (r Ref) Key() RefKey {
 	return RefKey(strconv.Itoa(int(crc32.ChecksumIEEE([]byte(r.Type.String() + r.Name)))))
 }
 
+// GetByKey returns a Ref given its RefKey
 func (rs Refs) GetByKey(k RefKey) (r *Ref, ok bool) {
 	r, ok = rs[k]
 	return
 }
 
+// Search looks up for references by Name in a fuzzy finding fashion, it will return
+// them sorted by pertinence
 func (rs Refs) Search(filter string, limit int) (refs RankedRefs) {
 	for _, r := range rs {
 		if rank := fuzzy.RankMatchNormalizedFold(filter, r.Name); rank >= 0 {
@@ -82,6 +99,8 @@ func (rs Refs) Search(filter string, limit int) (refs RankedRefs) {
 	return
 }
 
+// GetByClosestNameMatch returns the Ref which is the most pertinent
+// given its Name
 func (rs Refs) GetByClosestNameMatch(name string) (ref *Ref) {
 	if len(name) == 0 {
 		return
