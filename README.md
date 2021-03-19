@@ -1,12 +1,13 @@
-# slack-git-compare
+# 🗄️ slack-git-compare
 
-[![GoDoc](https://godoc.org/github.com/mvisonneau/slack-git-compare?status.svg)](https://godoc.org/github.com/mvisonneau/slack-git-compare)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/mvisonneau/slack-git-compare)](https://pkg.go.dev/mod/github.com/mvisonneau/slack-git-compare)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mvisonneau/slack-git-compare)](https://goreportcard.com/report/github.com/mvisonneau/slack-git-compare)
-[![Docker Pulls](https://img.shields.io/docker/pulls/mvisonneau/slack-git-compare.svg)](https://hub.docker.com/r/mvisonneau/slack-git-compare/)
-[![Build Status](https://github.com/mvisonneau/slack-git-compare/workflows/test/badge.svg?branch=main)](https://github.com/mvisonneau/slack-git-compare/actions)
+[![test](https://github.com/mvisonneau/slack-git-compare/actions/workflows/test.yml/badge.svg)](https://github.com/mvisonneau/slack-git-compare/actions/workflows/test.yml)
 [![Coverage Status](https://coveralls.io/repos/github/mvisonneau/slack-git-compare/badge.svg?branch=main)](https://coveralls.io/github/mvisonneau/slack-git-compare?branch=main)
+[![release](https://github.com/mvisonneau/slack-git-compare/actions/workflows/release.yml/badge.svg)](https://github.com/mvisonneau/slack-git-compare/actions/workflows/release.yml)
+[![slack-git-compare](https://snapcraft.io/slack-git-compare/badge.svg)](https://snapcraft.io/slack-git-compare)
 
-This is a slack command handler to compare git refs from whether GitHub or GitLab, within Slack
+This is a slack command handler to compare git refs from whether `GitHub` or `GitLab`, within **Slack**
 
 ## Develop / Test
 
@@ -37,7 +38,3 @@ If you want to build and/or release your own version of `slack-git-compare`, you
 ## Contribute
 
 Contributions are more than welcome! Feel free to submit a [PR](https://github.com/mvisonneau/slack-git-compare/pulls).
-
-## Terminology
-
-`slack-git-compare` is a conjugation of the verb [approuver](https://www.larousse.fr/conjugaison/francais/approuver/518) in French 🇫🇷, equivalent to `approve` in English 🇬🇧
