@@ -1,0 +1,6 @@
+dist
+vendor
+**/*.tgz
+slack-git-compare
+!cmd/slack-git-compare
+coverage.out

@@ -1,0 +1,128 @@
+before:
+  hooks:
+    - go mod download
+
+builds:
+  - main: ./cmd/slack-git-compare
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ignore:
+      - goos: darwin
+        goarch: 386
+
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}'
+    format_overrides:
+      - goos: windows
+        format: zip
+
+nfpms:
+  - maintainer: &author Maxime VISONNEAU <maxime.visonneau@gmail.com>
+    description: &description Compare git references within Slack
+    license: &license Apache-2.0
+    homepage: &homepage https://github.com/mvisonneau/slack-git-compare
+    vendor: *author
+    file_name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}'
+    formats:
+      - deb
+      - rpm
+
+brews:
+  - description: *description
+    homepage: *homepage
+    folder: Formula
+    tap:
+      owner: mvisonneau
+      name: homebrew-tap
+
+scoop:
+  description: *description
+  homepage: *homepage
+  license: *license
+  bucket:
+    owner: mvisonneau
+    name: scoops
+
+snapcrafts:
+  - summary: *description
+    description: Without moving away from Slack, get and publish the diff of 2 git references
+    license: *license
+    grade: stable
+    apps:
+      slack-git-compare:
+        plugs: [home, network, network-bind]
+
+dockers:
+  - image_templates:
+      - 'docker.io/mvisonneau/slack-git-compare:{{ .Tag }}-amd64'
+      - 'ghcr.io/mvisonneau/slack-git-compare:{{ .Tag }}-amd64'
+    ids: [slack-git-compare]
+    goarch: amd64
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/mvisonneau/slack-git-compare
+      - --label=org.opencontainers.image.source=https://github.com/mvisonneau/slack-git-compare
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=Apache-2.0
+
+  - image_templates:
+      - 'docker.io/mvisonneau/slack-git-compare:{{ .Tag }}-arm64v8'
+      - 'ghcr.io/mvisonneau/slack-git-compare:{{ .Tag }}-arm64v8'
+    ids: [slack-git-compare]
+    goarch: arm64
+    use_buildx: true
+    build_flag_templates:
+      - --platform=linux/arm64/v8
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/mvisonneau/slack-git-compare
+      - --label=org.opencontainers.image.source=https://github.com/mvisonneau/slack-git-compare
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=Apache-2.0
+
+docker_manifests:
+  - name_template: docker.io/mvisonneau/slack-git-compare:{{ .Tag }}
+    image_templates:
+      - docker.io/mvisonneau/slack-git-compare:{{ .Tag }}-amd64
+      - docker.io/mvisonneau/slack-git-compare:{{ .Tag }}-arm64v8
+
+  - name_template: ghcr.io/mvisonneau/slack-git-compare:{{ .Tag }}
+    image_templates:
+      - ghcr.io/mvisonneau/slack-git-compare:{{ .Tag }}-amd64
+      - ghcr.io/mvisonneau/slack-git-compare:{{ .Tag }}-arm64v8
+
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Tag }}_sha512sums.txt'
+  algorithm: sha512
+
+signs:
+  - artifacts: checksum
+    args:
+      [
+        '-u',
+        'C09CA9F71C5C988E65E3E5FCADEA38EDC46F25BE',
+        '--output',
+        '${signature}',
+        '--detach-sign',
+        '${artifact}',
+      ]
+
+changelog:
+  skip: true
