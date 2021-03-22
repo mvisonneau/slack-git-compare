@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  slack-git-compare:
+    image: docker.io/mvisonneau/slack-git-compare:latest
+    # You can comment out the image name and use the following statement
+    # to build the image against the current version of the repository
+    # build: ../..
+    ports:
+      - 8080:8080
+    environment:
+      # SGC_SLACK_TOKEN: xoxb-xxxxx
+      # SGC_SLACK_SIGNING_SECRET: xxxx
+      # SGC_GITHUB_TOKEN: xxx
+      # SGC_GITHUB_ORG: foo,bar
+      # SGC_GITLAB_TOKEN: xxx
+      # SGC_GITLAB_GROUP: foo,bar
+      SGC_LOG_LEVEL: debug
+
+networks:
+  default:
+    driver: bridge
