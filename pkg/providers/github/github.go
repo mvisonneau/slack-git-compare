@@ -109,7 +109,7 @@ func (p Provider) Compare(project string, fromRef, toRef providers.Ref) (cmp pro
 		return
 	}
 
-	cmp.WebURL = fmt.Sprintf("%s/%s/-/compare?from=%s&to=%s", p.WebBaseURL(), project, fromRef.Name, toRef.Name)
+	cmp.WebURL = fmt.Sprintf("%s/%s/compare/%s...%s", p.WebBaseURL(), project, fromRef.Name, toRef.Name)
 	for _, commit := range githubCompare.Commits {
 		cmp.Commits = append(cmp.Commits, providers.Commit{
 			ID:          commit.GetSHA(),
