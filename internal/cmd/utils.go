@@ -35,11 +35,11 @@ func configure(ctx *cli.Context) (c config) {
 	}
 
 	if len(ctx.String("github-token")) > 0 {
-		assertStringSliceVariableNotEmpty(ctx, "github-org")
+		assertStringSliceVariableNotEmpty(ctx, "github-orgs")
 	}
 
 	if len(ctx.String("gitlab-token")) > 0 {
-		assertStringSliceVariableNotEmpty(ctx, "gitlab-group")
+		assertStringSliceVariableNotEmpty(ctx, "gitlab-groups")
 	}
 
 	if len(ctx.String("github-token")) == 0 && len(ctx.String("gitlab-token")) == 0 {
@@ -51,10 +51,10 @@ func configure(ctx *cli.Context) (c config) {
 	c.ListenAddress = ctx.String("listen-address")
 	c.Slack.ProviderGitHubToken = ctx.String("github-token")
 	c.Slack.ProviderGitHubURL = ctx.String("github-url")
-	c.Slack.ProviderGitHubOrgs = ctx.StringSlice("github-org")
+	c.Slack.ProviderGitHubOrgs = ctx.StringSlice("github-orgs")
 	c.Slack.ProviderGitLabToken = ctx.String("gitlab-token")
 	c.Slack.ProviderGitLabURL = ctx.String("gitlab-url")
-	c.Slack.ProviderGitLabGroups = ctx.StringSlice("gitlab-group")
+	c.Slack.ProviderGitLabGroups = ctx.StringSlice("gitlab-groups")
 	c.Slack.SigningSecret = ctx.String("slack-signing-secret")
 	c.Slack.Token = ctx.String("slack-token")
 	return

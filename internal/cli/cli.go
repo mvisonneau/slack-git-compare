@@ -28,9 +28,9 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 
 	app.Flags = cli.FlagsByName{
 		&cli.StringSliceFlag{
-			Name:    "github-org",
-			EnvVars: []string{"SGC_GITHUB_ORG"},
-			Usage:   "GitHub `organization` to list repositories from (can be set multiple times)",
+			Name:    "github-orgs",
+			EnvVars: []string{"SGC_GITHUB_ORGS"},
+			Usage:   "GitHub `organizations` to list repositories from (can be set multiple times)",
 		},
 		&cli.StringFlag{
 			Name:    "github-url",
@@ -44,9 +44,9 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 			Usage:   "GitHub `token`",
 		},
 		&cli.StringSliceFlag{
-			Name:    "gitlab-group",
-			EnvVars: []string{"SGC_GITHUB_GROUP"},
-			Usage:   "GitLab `group` to list repositories from (can be set multiple times)",
+			Name:    "gitlab-groups",
+			EnvVars: []string{"SGC_GITLAB_GROUPS"},
+			Usage:   "GitLab `groups` to list repositories from (can be set multiple times)",
 		},
 		&cli.StringFlag{
 			Name:    "gitlab-url",

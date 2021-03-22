@@ -91,13 +91,23 @@ You can check the chart's [values.yml](https://github.com/mvisonneau/helm-charts
 
 # Configure a minimal configuration for the exporter
 ~$ cat <<EOF > values.yml
-config:
-  SGC_SLACK_TOKEN: xoxb-123456789-xxx-xxx
-  SGC_SLACK_SIGNING_SECRET: 123456789xxxxxx
-  SGC_GITHUB_TOKEN: xxxxx
-  SGC_GITHUB_ORG: cilium,foo,bar
-  SGC_GITLAB_TOKEN: xxxx
-  SGC_GITLAB_GROUP: gitlab-org,foo,bar
+envVariables:
+  - name: SGC_LOG_FORMAT
+    value: json
+  - name: SGC_LOG_LEVEL
+    value: debug
+  - name: SGC_GITHUB_TOKEN
+    value: "<your-github-token>"
+  - name: SGC_GITHUB_ORG
+    value: "<your-github-orgs (comma separated)>"
+  - name: SGC_GITLAB_TOKEN
+    value: "<your-gitlab-token>"
+  - name: SGC_GITLAB_GROUP
+    value: "<your-gitlab-groups (comma separated)>"
+  - name: SGC_SLACK_TOKEN
+    value: "<your-slack-token>"
+  - name: SGC_SLACK_SIGNING_SECRET
+    value: "<your-slack-signing_secret>"
 EOF
 
 # Release the chart on your Kubernetes cluster
