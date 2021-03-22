@@ -90,24 +90,23 @@ You can check the chart's [values.yml](https://github.com/mvisonneau/helm-charts
 ~$ helm repo add mvisonneau https://charts.visonneau.fr
 
 # Configure a minimal configuration for the exporter
+# only one of github/gitlab needs to be configured
 ~$ cat <<EOF > values.yml
-envVariables:
-  - name: SGC_LOG_FORMAT
-    value: json
-  - name: SGC_LOG_LEVEL
-    value: debug
-  - name: SGC_GITHUB_TOKEN
-    value: "<your-github-token>"
-  - name: SGC_GITHUB_ORG
-    value: "<your-github-orgs (comma separated)>"
-  - name: SGC_GITLAB_TOKEN
-    value: "<your-gitlab-token>"
-  - name: SGC_GITLAB_GROUP
-    value: "<your-gitlab-groups (comma separated)>"
-  - name: SGC_SLACK_TOKEN
-    value: "<your-slack-token>"
-  - name: SGC_SLACK_SIGNING_SECRET
-    value: "<your-slack-signing_secret>"
+config:
+  github:
+    url: 'https://api.github.com/'
+    token: '<your-github-token>'
+    orgs: '<your-github-orgs (comma separated)>'
+
+  gitlab:
+    url: 'https://gitlab.com'
+    token: '<your-gitlab-token>'
+    groups: '<your-gitlab-groups (comma separated)>'
+
+  slack:
+    token: '<your-slack-token>'
+    signing-secret: '<your-slack-signing-secret>'
+
 EOF
 
 # Release the chart on your Kubernetes cluster
