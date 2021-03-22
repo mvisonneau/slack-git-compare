@@ -7,6 +7,8 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 
 ## [Unreleased]
 
+## [v0.0.1] - 2021-03-22
+
 ### Added
 
 - GitHub support (.com & self-hosted)
