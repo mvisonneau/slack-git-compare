@@ -87,20 +87,26 @@ Set all of the following scopes:
 # token and org/group you want to work onto from Slack, eg:
 
 ```yaml
-# Edit docker-compose.yml
-version: '3.8'
-services:
-  slack-git-compare:
-    image: docker.io/mvisonneau/slack-git-compare:latest
-    ports:
-      - 8080:8080
-    environment:
-      SGC_SLACK_TOKEN: xoxb-123456789-xxx-xxx
-      SGC_SLACK_SIGNING_SECRET: 123456789xxxxxx
-      SGC_GITHUB_TOKEN: xxxxx
-      SGC_GITHUB_ORG: cilium,foo,bar
-      SGC_GITLAB_TOKEN: xxxx
-      SGC_GITLAB_GROUP: gitlab-org,foo,bar
+# Edit config.yml
+# dhall types are also available in ./config/types.dhall
+
+providers:
+  - type: github
+    token: <your_github_token>
+    owners:
+      - cilium
+  
+  - type: gitlab
+    token: <your_gitlab_token>
+    owners:
+      - gitlab-org
+
+slack:
+  token: <your_slack_app_token>
+  signing_secret: <your_slack_app_signing_secret>
+
+log:
+  level: debug
 ```
 
 ```bash

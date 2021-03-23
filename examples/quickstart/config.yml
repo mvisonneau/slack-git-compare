@@ -1,0 +1,18 @@
+---
+providers:
+  - type: github
+    token: <your_github_token>
+    owners:
+      - cilium
+  
+  - type: gitlab
+    token: <your_gitlab_token>
+    owners:
+      - gitlab-org
+
+slack:
+  token: <your_slack_app_token>
+  signing_secret: <your_slack_app_signing_secret>
+
+log:
+  level: debug
