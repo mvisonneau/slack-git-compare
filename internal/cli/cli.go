@@ -31,7 +31,7 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 			Name:    "config",
 			Aliases: []string{"c"},
 			EnvVars: []string{"SGC_CONFIG"},
-			Usage:   "config `file` (dhall, json or yaml format)",
+			Usage:   "config `file` (json or yaml format)",
 			Value:   "./config.json",
 		},
 		&cli.StringFlag{

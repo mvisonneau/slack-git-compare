@@ -117,6 +117,27 @@ EOF
 
 Here is documentation about [how to get started](examples/quickstart) with the tool.
 
+## Usage
+
+```
+~$ slack-git-compare --help
+NAME:
+   slack-git-compare - Compare git refs within Slack
+
+USAGE:
+   slack-git-compare [global options] command [command options] [arguments...]
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --config file, -c file                 config file (dhall, json or yaml format) (default: "./config.json") [$SGC_CONFIG]
+   --github-token token                   GitHub token [$SGC_GITHUB_TOKEN]
+   --gitlab-token token                   GitLab token [$SGC_GITLAB_TOKEN]
+   --slack-token token                    Slack token [$SGC_SLACK_TOKEN]
+   --slack-signing-secret signing-secret  Slack signing-secret [$SGC_SLACK_SIGNING_SECRET]
+   --help, -h                             show help (default: false)
+```
 ## Develop / Test
 
 ```bash
