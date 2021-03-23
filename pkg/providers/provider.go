@@ -66,6 +66,7 @@ func (ps Providers) ListRepositories() (repos Repositories, err error) {
 	return repos, nil
 }
 
+// GetProviderTypeFromString returns a ProviderType based onto a given string
 func GetProviderTypeFromString(p string) (pt ProviderType, err error) {
 	mapping := map[string]ProviderType{
 		"github": ProviderTypeGitHub,

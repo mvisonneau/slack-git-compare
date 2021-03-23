@@ -7,6 +7,7 @@ import (
 
 var validate *validator.Validate
 
+// Provider holds the configuration of a git provider
 type Provider struct {
 	Type   string `validate:"oneof=github gitlab"`
 	URL    string
@@ -14,25 +15,31 @@ type Provider struct {
 	Owners []string `validate:"gt=0"`
 }
 
+// Providers is a slice of Provider
 type Providers []Provider
 
+// Log holds runtime logging configuration
 type Log struct {
 	Level  string `default:"info" validate:"required,oneof=trace debug info warning error fatal panic"`
 	Format string `default:"text" validate:"oneof=text json"`
 }
 
+// Slack holds Slack related configuration
 type Slack struct {
 	Token         string `validate:"required"`
 	SigningSecret string `validate:"required" json:"signing_secret" yaml:"signing_secret"`
 }
 
+// User can be used to alias email addresses for a Slack user
 type User struct {
 	Email   string   `validate:"required,email"`
 	Aliases []string `validate:"gt=0"`
 }
 
+// Users is a slice of User
 type Users []User
 
+// Config represents all the parameters required for the app to be configured properly
 type Config struct {
 	Providers     Providers `validate:"gt=0,unique=Type"`
 	ListenAddress string    `default:":8080" validate:"required"`
@@ -41,11 +48,13 @@ type Config struct {
 	Users         Users
 }
 
+// NewConfig returns a new Config with default values
 func NewConfig() (cfg Config) {
-	defaults.Set(&cfg)
+	_ = defaults.Set(&cfg)
 	return
 }
 
+// Validate will throw an error if the Config parameters are whether incomplete or incorrects
 func (c Config) Validate() error {
 	if validate == nil {
 		validate = validator.New()

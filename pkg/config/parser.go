@@ -9,19 +9,25 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type ConfigType uint8
+// Format represents the format of the config file
+type Format uint8
 
 const (
-	ConfigTypeJson ConfigType = iota
-	ConfigTypeYaml
+	// FormatJSON represents a Config written in json format
+	FormatJSON Format = iota
+
+	// FormatYAML represents a Config written in yaml format
+	FormatYAML
 )
 
+// ParseFile reads the content of a file and attempt to unmarshal it
+// into a Config
 func ParseFile(filename string) (c Config, err error) {
-	var ct ConfigType
+	var t Format
 	var fileBytes []byte
 
 	// Figure out what type of config file we provided
-	ct, err = GetConfigTypeFromFileExtension(filename)
+	t, err = GetTypeFromFileExtension(filename)
 	if err != nil {
 		return
 	}
@@ -33,31 +39,34 @@ func ParseFile(filename string) (c Config, err error) {
 	}
 
 	// Parse the content and return Config
-	return Parse(ct, fileBytes)
+	return Parse(t, fileBytes)
 }
 
-func Parse(ct ConfigType, bytes []byte) (Config, error) {
+// Parse unmarshal provided bytes with given ConfigType into a Config object
+func Parse(f Format, bytes []byte) (Config, error) {
 	cfg := NewConfig()
 	var err error
 
-	switch ct {
-	case ConfigTypeJson:
+	switch f {
+	case FormatJSON:
 		err = json.Unmarshal(bytes, &cfg)
-	case ConfigTypeYaml:
+	case FormatYAML:
 		err = yaml.Unmarshal(bytes, &cfg)
 	default:
-		err = fmt.Errorf("unsupported config type '%+v'", ct)
+		err = fmt.Errorf("unsupported config type '%+v'", f)
 	}
 	return cfg, err
 }
 
-func GetConfigTypeFromFileExtension(filename string) (c ConfigType, err error) {
+// GetTypeFromFileExtension returns the ConfigType based upon the extension of
+// the file
+func GetTypeFromFileExtension(filename string) (f Format, err error) {
 	ext := filepath.Ext(filename)
 	switch ext {
-	case ".yml", ".yaml":
-		c = ConfigTypeYaml
 	case ".json":
-		c = ConfigTypeJson
+		f = FormatJSON
+	case ".yml", ".yaml":
+		f = FormatYAML
 	default:
 		err = fmt.Errorf("unsupported config type '%s', expected .dhall, .json or .y(a)ml", ext)
 	}
