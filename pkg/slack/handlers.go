@@ -38,69 +38,131 @@ func (s Slack) verifySigningSecret(r *http.Request) error {
 	return verifier.Ensure()
 }
 
-func generateModalRequestRepositoryPicker(conversationID *string, repo *providers.Repository, fromRef, toRef *providers.Ref, cmp *providers.Comparison) slack.ModalViewRequest {
-	titleText := slack.NewTextBlockObject("plain_text", "git compare", false, false)
-	closeText := slack.NewTextBlockObject("plain_text", "Cancel", false, false)
-	submitText := slack.NewTextBlockObject("plain_text", "Compare", false, false)
+func generateModalRequestRepositoryPicker(conversationID string, repo *providers.Repository, fromRef, toRef *providers.Ref, cmp *providers.Comparison) slack.ModalViewRequest {
+	modalRequest := slack.ModalViewRequest{}
+	modalRequest.Type = slack.ViewType("modal")
+	modalRequest.Title = slack.NewTextBlockObject(slack.PlainTextType, "git compare", false, false)
+	modalRequest.Close = slack.NewTextBlockObject(slack.PlainTextType, "Close", false, false)
+	modalRequest.Submit = slack.NewTextBlockObject(slack.PlainTextType, "Post to channel", false, false)
+	modalRequest.CallbackID = conversationID
 
-	repositoriesPrompt := slack.NewTextBlockObject("mrkdwn", "*Choose a repository*", false, false)
-	repositoriesPromptSection := slack.NewSectionBlock(repositoriesPrompt, nil, nil)
+	// repositoriesRefreshSection := slack.NewSectionBlock(
+	// 	slack.NewTextBlockObject(slack.MarkdownType, "_last updated 2m ago_", false, false),
+	// 	nil,
+	// 	slack.NewAccessory(
+	// 		slack.NewButtonBlockElement(
+	// 			"refresh_repositories",
+	// 			"",
+	// 			slack.NewTextBlockObject(
+	// 				slack.PlainTextType,
+	// 				"update now",
+	// 				false,
+	// 				false,
+	// 			),
+	// 		),
+	// 	),
+	// )
 
 	repositoriesElement := slack.NewOptionsSelectBlockElement(slack.OptTypeExternal, nil, "repository")
 	repositoriesElement.MinQueryLength = pointy.Int(0)
-	repositoriesInput := slack.NewActionBlock("repositories", repositoriesElement)
-
-	channelsText := slack.NewTextBlockObject("plain_text", "Conversation", false, false)
-	channelsElement := slack.NewOptionsSelectBlockElement(slack.OptTypeConversations, nil, "conversation_id")
-	// channelsElement.ResponseURLEnabled = true
-
-	if conversationID != nil {
-		channelsElement.InitialConversation = *conversationID
-	} else {
-		channelsElement.DefaultToCurrentConversation = true
-	}
+	repositoriesInput := slack.NewInputBlock(
+		"repositories",
+		slack.NewTextBlockObject(slack.PlainTextType, "Select a repository", false, false),
+		repositoriesElement,
+	)
+	repositoriesInput.DispatchAction = true
 
 	blocks := slack.Blocks{
 		BlockSet: []slack.Block{
-			slack.NewSectionBlock(channelsText, nil, slack.NewAccessory(channelsElement), slack.SectionBlockOptionBlockID("conversation_id")),
-			repositoriesPromptSection,
 			repositoriesInput,
+			// repositoriesRefreshSection,
 		},
 	}
 
-	var modalRequest slack.ModalViewRequest
-	modalRequest.Type = slack.ViewType("modal")
-
 	if repo != nil {
+		// This is how we keep the selected repository across modal refreshes
 		repositoriesElement.InitialOption = slack.NewOptionBlockObject(fmt.Sprintf("x/%s", repo.Key()), slack.NewTextBlockObject("plain_text", fmt.Sprintf(":%s: %s", repo.ProviderType, repo.Name), true, false), nil)
+
+		// When need to store the repository key in here to be able to read it
+		// during the block submission payloads of to_ref & from_ref external_select
 		modalRequest.PrivateMetadata = string(repo.Key())
 
 		// Add a divider
 		blocks.BlockSet = append(blocks.BlockSet, slack.NewDividerBlock())
 
-		fromRefPrompt := slack.NewTextBlockObject("mrkdwn", "*From (BASE)*", false, false)
+		// FROM REF
 		fromRefElement := slack.NewOptionsSelectBlockElement(slack.OptTypeExternal, nil, "from_ref")
 		fromRefElement.MinQueryLength = pointy.Int(0)
 		if fromRef != nil {
-			fromRefElement.InitialOption = slack.NewOptionBlockObject(fmt.Sprintf("x/%s", fromRef.Key()), slack.NewTextBlockObject("plain_text", fmt.Sprintf("%s/%s", fromRef.Type, fromRef.Name), true, false), nil)
+			fromRefElement.InitialOption = slack.NewOptionBlockObject(
+				fmt.Sprintf("x/%s", fromRef.Key()),
+				slack.NewTextBlockObject(
+					slack.PlainTextType,
+					fmt.Sprintf("%s/%s", fromRef.Type, fromRef.Name),
+					true,
+					false,
+				),
+				nil,
+			)
 		}
 
-		toRefPrompt := slack.NewTextBlockObject("mrkdwn", "*To (HEAD)*", false, false)
+		fromRefInput := slack.NewInputBlock(
+			"from_ref",
+			slack.NewTextBlockObject(slack.PlainTextType, "From (BASE)", false, false),
+			fromRefElement,
+		)
+		fromRefInput.DispatchAction = true
+
+		// TO REF
 		toRefElement := slack.NewOptionsSelectBlockElement(slack.OptTypeExternal, nil, "to_ref")
 		toRefElement.MinQueryLength = pointy.Int(0)
 		if toRef != nil {
-			toRefElement.InitialOption = slack.NewOptionBlockObject(fmt.Sprintf("x/%s", toRef.Key()), slack.NewTextBlockObject("plain_text", fmt.Sprintf("%s/%s", toRef.Type, toRef.Name), true, false), nil)
+			toRefElement.InitialOption = slack.NewOptionBlockObject(
+				fmt.Sprintf("x/%s", toRef.Key()),
+				slack.NewTextBlockObject(
+					slack.PlainTextType,
+					fmt.Sprintf("%s/%s", toRef.Type, toRef.Name),
+					true,
+					false,
+				),
+				nil,
+			)
 		}
 
+		toRefInput := slack.NewInputBlock(
+			"to_ref",
+			slack.NewTextBlockObject(slack.PlainTextType, "To (HEAD)", false, false),
+			toRefElement,
+		)
+		toRefInput.DispatchAction = true
+
+		// Refresh refs
+		// refsRefreshSection := slack.NewSectionBlock(
+		// 	slack.NewTextBlockObject(slack.MarkdownType, "_last updated 2m ago_", false, false),
+		// 	nil,
+		// 	slack.NewAccessory(
+		// 		slack.NewButtonBlockElement(
+		// 			"refresh_refs",
+		// 			string(repo.Key()),
+		// 			slack.NewTextBlockObject(
+		// 				slack.PlainTextType,
+		// 				"update now",
+		// 				false,
+		// 				false,
+		// 			),
+		// 		),
+		// 	),
+		// )
+
 		// Add the refs selectors
-		blocks.BlockSet = append(blocks.BlockSet, slack.NewSectionBlock(fromRefPrompt, nil, nil))
-		blocks.BlockSet = append(blocks.BlockSet, slack.NewActionBlock("from_ref", fromRefElement))
-		blocks.BlockSet = append(blocks.BlockSet, slack.NewSectionBlock(toRefPrompt, nil, nil))
-		blocks.BlockSet = append(blocks.BlockSet, slack.NewActionBlock("to_ref", toRefElement))
+		blocks.BlockSet = append(blocks.BlockSet, fromRefInput)
+		blocks.BlockSet = append(blocks.BlockSet, toRefInput)
+		// blocks.BlockSet = append(blocks.BlockSet, refsRefreshSection)
 
 		if cmp != nil {
 			// Add a divider
 			blocks.BlockSet = append(blocks.BlockSet, slack.NewDividerBlock())
+
 			var msg string
 			if cmp.CommitCount() == 0 {
 				msg = ":shrug: there are no difference between the refs"
@@ -120,12 +182,8 @@ func generateModalRequestRepositoryPicker(conversationID *string, repo *provider
 		}
 	}
 
-	modalRequest.Title = titleText
-	modalRequest.Close = closeText
-	modalRequest.Submit = submitText
 	modalRequest.Blocks = blocks
-	// payload, _ := json.Marshal(modalRequest)
-	// log.Debug(string(payload))
+
 	return modalRequest
 }
 
@@ -232,7 +290,7 @@ func (s Slack) SlashHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			modalRequest := generateModalRequestRepositoryPicker(&cmd.ChannelID, repo, fromRef, toRef, cmp)
+			modalRequest := generateModalRequestRepositoryPicker(cmd.ChannelID, repo, fromRef, toRef, cmp)
 			resp, err := s.Client.OpenView(cmd.TriggerID, modalRequest)
 			if err != nil {
 				log.WithError(fmt.Errorf("opening view: %s -> %v", err.Error(), resp.ResponseMetadata)).Error()
@@ -280,8 +338,6 @@ func (s Slack) ModalHandler(w http.ResponseWriter, r *http.Request) {
 		cmp            *providers.Comparison
 	)
 
-	conversationID := i.View.State.Values["conversation_id"]["conversation_id"].SelectedConversation
-
 	repoKey := i.View.State.Values["repositories"]["repository"].SelectedOption.Value
 	if len(repoKey) > 0 {
 		var found bool
@@ -298,7 +354,7 @@ func (s Slack) ModalHandler(w http.ResponseWriter, r *http.Request) {
 		var found bool
 		fromRef, found = repo.Refs[providers.RefKey(stripRankFromValue(fromRefKey))]
 		if !found {
-			if err = s.sendMessage(conversationID, fmt.Sprintf("unable to find ref_key `%s`", stripRankFromValue(fromRefKey))); err != nil {
+			if err = s.sendMessage(i.View.CallbackID, fmt.Sprintf("unable to find ref_key `%s`", stripRankFromValue(fromRefKey))); err != nil {
 				log.WithError(err).Error()
 			}
 			log.WithError(err).Error()
@@ -312,7 +368,7 @@ func (s Slack) ModalHandler(w http.ResponseWriter, r *http.Request) {
 		var found bool
 		toRef, found = repo.Refs[providers.RefKey(stripRankFromValue(toRefKey))]
 		if !found {
-			if err = s.sendMessage(conversationID, fmt.Sprintf("unable to find ref_key `%s`", stripRankFromValue(toRefKey))); err != nil {
+			if err = s.sendMessage(i.View.CallbackID, fmt.Sprintf("unable to find ref_key `%s`", stripRankFromValue(toRefKey))); err != nil {
 				log.WithError(err).Error()
 			}
 			log.WithError(err).Error()
@@ -334,7 +390,7 @@ func (s Slack) ModalHandler(w http.ResponseWriter, r *http.Request) {
 	// We only want to update the view when we change the repository select
 	switch i.Type {
 	case slack.InteractionTypeBlockActions:
-		resp, err := s.Client.UpdateView(generateModalRequestRepositoryPicker(&conversationID, repo, fromRef, toRef, cmp), "", i.View.Hash, i.View.ID)
+		resp, err := s.Client.UpdateView(generateModalRequestRepositoryPicker(i.View.CallbackID, repo, fromRef, toRef, cmp), "", i.View.Hash, i.View.ID)
 		if err != nil {
 			log.WithError(fmt.Errorf("updating view: %s -> %v", err.Error(), resp.ResponseMetadata)).Error()
 		}
@@ -343,8 +399,7 @@ func (s Slack) ModalHandler(w http.ResponseWriter, r *http.Request) {
 			log.Error("did not expect repo to be nil")
 			return
 		}
-		log.Trace("picked conversation:" + conversationID)
-		if _, _, err := s.Client.PostMessage(conversationID, slack.MsgOptionBlocks(generateComparisonMessage(*repo, *fromRef, *toRef, *cmp, i.User.ID).BlockSet...)); err != nil {
+		if _, _, err := s.Client.PostMessage(i.View.CallbackID, slack.MsgOptionBlocks(generateComparisonMessage(*repo, *fromRef, *toRef, *cmp, i.User.ID).BlockSet...)); err != nil {
 			log.WithError(err).Error()
 			w.WriteHeader(http.StatusInternalServerError)
 			return

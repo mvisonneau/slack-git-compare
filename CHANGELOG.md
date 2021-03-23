@@ -14,6 +14,8 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 ### Changed
 
 - Moved configuration flags into a configuration file instead
+- Got bigger selectors in the Slack modal
+- Removed the conversation selector from the modal, fallback the location of the slash command instead
 
 ## [v0.0.1] - 2021-03-22
 
