@@ -97,7 +97,8 @@ func (p Provider) ListRepositories() (repos providers.Repositories, err error) {
 }
 
 // Compare calculates the diff between two git references
-func (p Provider) Compare(project string, fromRef, toRef providers.Ref) (cmp providers.Comparison, err error) {
+func (p Provider) Compare(project string, fromRef, toRef providers.Ref) (cmp *providers.Comparison, err error) {
+	cmp = &providers.Comparison{}
 	opts := &gitlab.CompareOptions{}
 
 	if fromRef.OriginRef != nil {
@@ -120,13 +121,15 @@ func (p Provider) Compare(project string, fromRef, toRef providers.Ref) (cmp pro
 	cmp.WebURL = fmt.Sprintf("%s/%s/-/compare/%s...%s", p.WebBaseURL(), project, *opts.From, *opts.To)
 	for _, commit := range gitlabCompare.Commits {
 		cmp.Commits = append(cmp.Commits, providers.Commit{
-			ID:          commit.ID,
-			ShortID:     commit.ShortID,
-			AuthorName:  commit.AuthorName,
-			AuthorEmail: commit.AuthorEmail,
-			CreatedAt:   *commit.CreatedAt,
-			Message:     commit.Message,
-			WebURL:      commit.WebURL,
+			ID:      commit.ID,
+			ShortID: commit.ShortID,
+			Author: providers.Author{
+				Name:  commit.AuthorName,
+				Email: commit.AuthorEmail,
+			},
+			CreatedAt: *commit.CreatedAt,
+			Message:   commit.Message,
+			WebURL:    commit.WebURL,
 		})
 	}
 
@@ -263,10 +266,6 @@ func (p *Provider) ListProjectEnvironments(project string) (refs providers.Refs,
 				envDetails, resp, err = p.client.Environments.GetEnvironment(project, env.ID)
 				if err != nil {
 					return
-				}
-
-				if envDetails.Name == "aew1-infra-core-dev" {
-					log.Debug(envDetails)
 				}
 
 				if envDetails.LastDeployment != nil && envDetails.LastDeployment.Deployable.Commit != nil {

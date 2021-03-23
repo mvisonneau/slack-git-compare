@@ -9,5 +9,6 @@ import (
 // TODO: Convert it to an interface in order to other storage
 // providers than in-memory
 type Storage struct {
-	Repositories providers.Repositories
+	Repositories           providers.Repositories
+	SlackUserEmailMappings map[string]string
 }

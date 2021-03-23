@@ -7,6 +7,10 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 
 ## [Unreleased]
 
+### Added
+
+- Capability to map slack users and git authors for an enhanced experience
+
 ### Changed
 
 - Moved configuration flags into a configuration file instead

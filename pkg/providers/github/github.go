@@ -103,7 +103,9 @@ func (p Provider) ListRepositories() (repos providers.Repositories, err error) {
 }
 
 // Compare calculates the diff between two git references
-func (p Provider) Compare(project string, fromRef, toRef providers.Ref) (cmp providers.Comparison, err error) {
+func (p Provider) Compare(project string, fromRef, toRef providers.Ref) (cmp *providers.Comparison, err error) {
+	cmp = &providers.Comparison{}
+
 	projectValues := strings.Split(project, "/")
 	if len(projectValues) != 2 {
 		err = fmt.Errorf("invalid project name '%s'", project)
@@ -118,13 +120,15 @@ func (p Provider) Compare(project string, fromRef, toRef providers.Ref) (cmp pro
 	cmp.WebURL = fmt.Sprintf("%s/%s/compare/%s...%s", p.WebBaseURL(), project, fromRef.Name, toRef.Name)
 	for _, commit := range githubCompare.Commits {
 		cmp.Commits = append(cmp.Commits, providers.Commit{
-			ID:          commit.GetSHA(),
-			ShortID:     commit.GetSHA()[:9],
-			AuthorName:  *commit.Commit.GetAuthor().Name,
-			AuthorEmail: *commit.Commit.GetAuthor().Email,
-			CreatedAt:   commit.Committer.GetCreatedAt().Time,
-			Message:     commit.Commit.GetMessage(),
-			WebURL:      commit.GetURL(),
+			ID:      commit.GetSHA(),
+			ShortID: commit.GetSHA()[:9],
+			Author: providers.Author{
+				Name:  *commit.Commit.GetAuthor().Name,
+				Email: *commit.Commit.GetAuthor().Email,
+			},
+			CreatedAt: commit.Committer.GetCreatedAt().Time,
+			Message:   commit.Commit.GetMessage(),
+			WebURL:    commit.GetURL(),
 		})
 	}
 

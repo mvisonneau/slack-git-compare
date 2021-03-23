@@ -56,7 +56,7 @@ func getHTTPServer(listenAddress string, s slack.Slack) *http.Server {
 func Run(cliContext *cli.Context) (int, error) {
 	cfg := configure(cliContext)
 	ctx := context.TODO()
-	s, err := slack.New(ctx, cfg.Slack, cfg.Providers)
+	s, err := slack.New(ctx, cfg.Slack, cfg.Providers, cfg.Users)
 	if err != nil {
 		log.Fatal(err)
 	}

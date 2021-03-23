@@ -56,10 +56,12 @@ func configCliOverrides(ctx *cli.Context, cfg *config.Config) {
 		"github-token": providers.ProviderTypeGitHub,
 		"gitlab-token": providers.ProviderTypeGitLab,
 	} {
-		for k, p := range cfg.Providers {
-			if p.Type == t.String() {
-				cfg.Providers[k].Token = ctx.String(f)
-				break
+		if ctx.String(f) != "" {
+			for k, p := range cfg.Providers {
+				if p.Type == t.String() {
+					cfg.Providers[k].Token = ctx.String(f)
+					break
+				}
 			}
 		}
 	}

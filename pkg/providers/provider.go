@@ -10,7 +10,7 @@ import (
 type Provider interface {
 	WebBaseURL() string
 	Type() ProviderType
-	Compare(string, Ref, Ref) (Comparison, error)
+	Compare(string, Ref, Ref) (*Comparison, error)
 	ListRepositories() (Repositories, error)
 	ListRefs(string) (Refs, error)
 }
