@@ -1,6 +1,8 @@
 package providers
 
 import (
+	"fmt"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -62,4 +64,19 @@ func (ps Providers) ListRepositories() (repos Repositories, err error) {
 	}).Debug("done fetching repositories")
 
 	return repos, nil
+}
+
+func GetProviderTypeFromString(p string) (pt ProviderType, err error) {
+	mapping := map[string]ProviderType{
+		"github": ProviderTypeGitHub,
+		"gitlab": ProviderTypeGitLab,
+	}
+
+	var found bool
+	pt, found = mapping[p]
+	if !found {
+		err = fmt.Errorf("invalid provider type '%s'", p)
+	}
+
+	return
 }

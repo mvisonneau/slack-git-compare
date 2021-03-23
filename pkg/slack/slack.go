@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mvisonneau/slack-git-compare/pkg/config"
 	"github.com/mvisonneau/slack-git-compare/pkg/providers"
 	"github.com/mvisonneau/slack-git-compare/pkg/providers/github"
 	"github.com/mvisonneau/slack-git-compare/pkg/providers/gitlab"
@@ -43,10 +44,10 @@ type NewOptions struct {
 }
 
 // New creates and configures a new Slack object
-func New(ctx context.Context, opts NewOptions) (s Slack, err error) {
-	s.Client = slack.New(opts.Token)
-	s.SigningSecret = opts.SigningSecret
-	if err = s.configureProviders(ctx, opts); err != nil {
+func New(ctx context.Context, slackConfig config.Slack, providersConfig config.Providers) (s Slack, err error) {
+	s.Client = slack.New(slackConfig.Token)
+	s.SigningSecret = slackConfig.SigningSecret
+	if err = s.configureProviders(ctx, providersConfig); err != nil {
 		return
 	}
 
@@ -55,44 +56,41 @@ func New(ctx context.Context, opts NewOptions) (s Slack, err error) {
 	return
 }
 
-func (s *Slack) configureProviders(ctx context.Context, opts NewOptions) (err error) {
+func (s *Slack) configureProviders(ctx context.Context, providersConfig config.Providers) error {
 	s.Providers = make(providers.Providers)
 
-	if len(opts.ProviderGitHubToken) > 0 {
-		if len(opts.ProviderGitHubOrgs) == 0 {
-			err = fmt.Errorf("you must define at least one --github-org")
-			return
+	if len(providersConfig) == 0 {
+		return fmt.Errorf("you must configure at least one git provider, none given")
+	}
+
+	for _, p := range providersConfig {
+		if len(p.Owners) == 0 {
+			return fmt.Errorf("you must define at least one 'owners', none given")
+		}
+
+		pt, err := providers.GetProviderTypeFromString(p.Type)
+		if err != nil {
+			return err
+		}
+
+		switch pt {
+		case providers.ProviderTypeGitHub:
+			s.Providers[pt], err = github.NewProvider(ctx, p.Token, p.URL, p.Owners)
+		case providers.ProviderTypeGitLab:
+			s.Providers[pt], err = gitlab.NewProvider(p.Token, p.URL, p.Owners)
+		}
+
+		if err != nil {
+			return err
 		}
 
 		log.WithFields(log.Fields{
-			"provider": providers.ProviderTypeGitHub,
-			"orgs":     opts.ProviderGitHubOrgs,
+			"provider": pt.String(),
+			"orgs":     p.Owners,
 		}).Debug("configured provider")
-
-		s.Providers[providers.ProviderTypeGitHub], err = github.NewProvider(ctx, opts.ProviderGitHubToken, opts.ProviderGitHubURL, opts.ProviderGitHubOrgs)
-		if err != nil {
-			return
-		}
 	}
 
-	if len(opts.ProviderGitLabToken) > 0 {
-		if len(opts.ProviderGitLabGroups) == 0 {
-			err = fmt.Errorf("you must define at least one --gitlab-org")
-			return
-		}
-
-		log.WithFields(log.Fields{
-			"provider": providers.ProviderTypeGitLab,
-			"groups":   opts.ProviderGitLabGroups,
-		}).Debug("configured provider")
-
-		s.Providers[providers.ProviderTypeGitLab], err = gitlab.NewProvider(opts.ProviderGitLabToken, opts.ProviderGitLabURL, opts.ProviderGitLabGroups)
-		if err != nil {
-			return
-		}
-	}
-
-	return
+	return nil
 }
 
 func generateModalRequestRepositoryPicker(conversationID *string, repo *providers.Repository, fromRef, toRef *providers.Ref, commitCount *uint) slack.ModalViewRequest {

@@ -1,0 +1,31 @@
+{
+  "providers": [
+    {
+      "owners": [
+        "cilium"
+      ],
+      "token": "xxxx",
+      "type": "github"
+    },
+    {
+      "owners": [
+        "gitlab-org"
+      ],
+      "token": "xxxx",
+      "type": "gitlab"
+    }
+  ],
+  "slack": {
+    "signing_secret": "xxxxx",
+    "token": "xobt-xxxxxx"
+  },
+  "users": [
+    {
+      "aliases": [
+        "alice@yolo.com",
+        "bob@yolo.com"
+      ],
+      "email": "foo@bar.baz"
+    }
+  ]
+}

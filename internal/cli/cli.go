@@ -27,32 +27,17 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 	app.EnableBashCompletion = true
 
 	app.Flags = cli.FlagsByName{
-		&cli.StringSliceFlag{
-			Name:    "github-orgs",
-			EnvVars: []string{"SGC_GITHUB_ORGS"},
-			Usage:   "GitHub `organizations` to list repositories from (can be set multiple times)",
-		},
 		&cli.StringFlag{
-			Name:    "github-url",
-			EnvVars: []string{"SGC_GITHUB_URL"},
-			Usage:   "GitHub `url`",
-			Value:   "https://api.github.com/",
+			Name:    "config",
+			Aliases: []string{"c"},
+			EnvVars: []string{"SGC_CONFIG"},
+			Usage:   "config `file` (dhall, json or yaml format)",
+			Value:   "./config.json",
 		},
 		&cli.StringFlag{
 			Name:    "github-token",
 			EnvVars: []string{"SGC_GITHUB_TOKEN"},
 			Usage:   "GitHub `token`",
-		},
-		&cli.StringSliceFlag{
-			Name:    "gitlab-groups",
-			EnvVars: []string{"SGC_GITLAB_GROUPS"},
-			Usage:   "GitLab `groups` to list repositories from (can be set multiple times)",
-		},
-		&cli.StringFlag{
-			Name:    "gitlab-url",
-			EnvVars: []string{"SGC_GITLAB_URL"},
-			Usage:   "GitLab `url`",
-			Value:   "https://gitlab.com",
 		},
 		&cli.StringFlag{
 			Name:    "gitlab-token",
@@ -68,24 +53,6 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 			Name:    "slack-signing-secret",
 			EnvVars: []string{"SGC_SLACK_SIGNING_SECRET"},
 			Usage:   "Slack `signing-secret`",
-		},
-		&cli.StringFlag{
-			Name:    "listen-address",
-			EnvVars: []string{"SGC_LISTEN_ADDRESS"},
-			Usage:   "`address` to bind our http server upon",
-			Value:   ":8080",
-		},
-		&cli.StringFlag{
-			Name:    "log-level",
-			EnvVars: []string{"SGC_LOG_LEVEL"},
-			Usage:   "log `level` (debug,info,warn,fatal,panic)",
-			Value:   "info",
-		},
-		&cli.StringFlag{
-			Name:    "log-format",
-			EnvVars: []string{"SGC_LOG_FORMAT"},
-			Usage:   "log `format` (json,text)",
-			Value:   "text",
 		},
 	}
 

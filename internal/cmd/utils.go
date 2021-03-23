@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/mvisonneau/go-helpers/logger"
-	"github.com/mvisonneau/slack-git-compare/pkg/slack"
+	"github.com/mvisonneau/slack-git-compare/pkg/config"
+	"github.com/mvisonneau/slack-git-compare/pkg/providers"
 	"github.com/urfave/cli/v2"
 
 	log "github.com/sirupsen/logrus"
@@ -13,51 +14,55 @@ import (
 
 var start time.Time
 
-type config struct {
-	ListenAddress string
-	Slack         slack.NewOptions
-}
-
-func configure(ctx *cli.Context) (c config) {
+func configure(ctx *cli.Context) config.Config {
 	start = ctx.App.Metadata["startTime"].(time.Time)
 
+	assertStringVariableDefined(ctx, "config")
+
+	cfg, err := config.ParseFile(ctx.String("config"))
+	if err != nil {
+		log.WithError(err).Fatal("loading config file")
+	}
+
+	configCliOverrides(ctx, &cfg)
+
+	if err = cfg.Validate(); err != nil {
+		log.WithError(err).Fatal("invalid config")
+	}
+
+	// Configure logger
 	if err := logger.Configure(logger.Config{
-		Level:  ctx.String("log-level"),
-		Format: ctx.String("log-format"),
+		Level:  cfg.Log.Level,
+		Format: cfg.Log.Format,
 	}); err != nil {
-		_ = cli.ShowAppHelp(ctx)
-		log.Errorf("incorrect logging configuration")
-		os.Exit(2)
+		log.WithError(err).Fatal("invalid logging config")
 	}
 
-	for _, i := range []string{"slack-token", "slack-signing-secret", "listen-address"} {
-		assertStringVariableDefined(ctx, i)
+	return cfg
+}
+
+func configCliOverrides(ctx *cli.Context, cfg *config.Config) {
+	// Override Slack config if necessary
+	if ctx.String("slack-token") != "" {
+		cfg.Slack.Token = ctx.String("slack-token")
 	}
 
-	if len(ctx.String("github-token")) > 0 {
-		assertStringSliceVariableNotEmpty(ctx, "github-orgs")
+	if ctx.String("slack-signing-secret") != "" {
+		cfg.Slack.SigningSecret = ctx.String("slack-signing-secret")
 	}
 
-	if len(ctx.String("gitlab-token")) > 0 {
-		assertStringSliceVariableNotEmpty(ctx, "gitlab-groups")
+	// Override providers config if necessary
+	for f, t := range map[string]providers.ProviderType{
+		"github-token": providers.ProviderTypeGitHub,
+		"gitlab-token": providers.ProviderTypeGitLab,
+	} {
+		for k, p := range cfg.Providers {
+			if p.Type == t.String() {
+				cfg.Providers[k].Token = ctx.String(f)
+				break
+			}
+		}
 	}
-
-	if len(ctx.String("github-token")) == 0 && len(ctx.String("gitlab-token")) == 0 {
-		_ = cli.ShowAppHelp(ctx)
-		log.Errorf("you must configure at least one git provider using --git(hub|lab)-token")
-		os.Exit(2)
-	}
-
-	c.ListenAddress = ctx.String("listen-address")
-	c.Slack.ProviderGitHubToken = ctx.String("github-token")
-	c.Slack.ProviderGitHubURL = ctx.String("github-url")
-	c.Slack.ProviderGitHubOrgs = ctx.StringSlice("github-orgs")
-	c.Slack.ProviderGitLabToken = ctx.String("gitlab-token")
-	c.Slack.ProviderGitLabURL = ctx.String("gitlab-url")
-	c.Slack.ProviderGitLabGroups = ctx.StringSlice("gitlab-groups")
-	c.Slack.SigningSecret = ctx.String("slack-signing-secret")
-	c.Slack.Token = ctx.String("slack-token")
-	return
 }
 
 func exit(exitCode int, err error) cli.ExitCoder {
@@ -85,14 +90,6 @@ func assertStringVariableDefined(ctx *cli.Context, k string) {
 	if len(ctx.String(k)) == 0 {
 		_ = cli.ShowAppHelp(ctx)
 		log.Errorf("'--%s' must be set!", k)
-		os.Exit(2)
-	}
-}
-
-func assertStringSliceVariableNotEmpty(ctx *cli.Context, k string) {
-	if len(ctx.StringSlice(k)) == 0 {
-		_ = cli.ShowAppHelp(ctx)
-		log.Errorf("'--%s' must be set at least once!", k)
 		os.Exit(2)
 	}
 }

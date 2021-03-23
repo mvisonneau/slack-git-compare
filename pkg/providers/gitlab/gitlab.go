@@ -27,7 +27,12 @@ func NewProvider(token, baseURL string, groups []string) (p Provider, err error)
 	)
 
 	p.groups = groups
-	p.webBaseURL = baseURL
+
+	if baseURL != "" {
+		p.webBaseURL = baseURL
+	} else {
+		p.webBaseURL = "https://gitlab.com"
+	}
 
 	return
 }

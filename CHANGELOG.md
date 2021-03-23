@@ -9,8 +9,7 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 
 ### Changed
 
-- Renamed flag `--github-org` to `--github-orgs`
-- Renamed flag `--gitlab-group` to `--gitlab-groups`
+- Moved configuration flags into a configuration file instead
 
 ## [v0.0.1] - 2021-03-22
 

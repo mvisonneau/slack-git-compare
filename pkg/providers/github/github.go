@@ -31,7 +31,13 @@ func NewProvider(ctx context.Context, token, baseURL string, orgs []string) (p P
 
 	p.ctx = ctx
 	p.client = github.NewClient(tc)
-	p.client.BaseURL, err = url.Parse(baseURL)
+
+	if baseURL != "" {
+		p.client.BaseURL, err = url.Parse(baseURL)
+	} else {
+		p.client.BaseURL, err = url.Parse("https://api.github.com/")
+	}
+
 	p.orgs = orgs
 
 	// TODO: This is probably not going to work for everyone, I suppose we should
