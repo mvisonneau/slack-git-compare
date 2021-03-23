@@ -10,7 +10,11 @@ let Provider/Type = < github | gitlab >
 
 let Provider
     : Type
-    = { type: Provider/Type, url : Optional Text, token : Text, owners : List Text }
+    = { type : Provider/Type
+      , url : Optional Text
+      , token : Text
+      , owners : List Text
+      }
 
 let Providers
     : Type
@@ -36,16 +40,14 @@ let Config
       , users : Users
       }
 
-in
-
-{ Log/Format
-, Log/Level
-, Log
-, Provider
-, Providers
-, Provider/Type
-, Slack
-, User
-, Users
-, Config
-}
+in  { Log/Format
+    , Log/Level
+    , Log
+    , Provider
+    , Providers
+    , Provider/Type
+    , Slack
+    , User
+    , Users
+    , Config
+    }
