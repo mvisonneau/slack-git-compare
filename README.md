@@ -19,8 +19,6 @@ This repositories holds the code of a daemon which communicates with git provide
 
 - For readability purposes, we currently only display up to 10 commits info per diff
 - On repositories with large amount of references, API calls may not be returned in less than 3s which causes Slack to dismiss the response.
-- There is currently no linking being done between commiters and slack users
-- Repositories are only loaded/refreshed at the start of the process
 
 ## Install
 

@@ -20,12 +20,12 @@ type Ref struct {
 }
 
 // Refs holds multiple Ref with their unique identifiers (RefKey)
-type Refs map[RefKey]*Ref
+type Refs map[RefKey]Ref
 
 // RankedRef can be used when fuzzy searching Refs, attributing a "rank"
 // for the Ref given the pertinence of its attributes given the search
 type RankedRef struct {
-	*Ref
+	Ref
 	Rank int
 }
 
@@ -68,7 +68,7 @@ func (r Ref) Key() RefKey {
 }
 
 // GetByKey returns a Ref given its RefKey
-func (rs Refs) GetByKey(k RefKey) (r *Ref, ok bool) {
+func (rs Refs) GetByKey(k RefKey) (r Ref, ok bool) {
 	r, ok = rs[k]
 	return
 }
@@ -101,7 +101,7 @@ func (rs Refs) Search(filter string, limit int) (refs RankedRefs) {
 
 // GetByClosestNameMatch returns the Ref which is the most pertinent
 // given its Name
-func (rs Refs) GetByClosestNameMatch(name string) (ref *Ref) {
+func (rs Refs) GetByClosestNameMatch(name string) (ref Ref) {
 	if len(name) == 0 {
 		return
 	}
@@ -111,4 +111,9 @@ func (rs Refs) GetByClosestNameMatch(name string) (ref *Ref) {
 		break
 	}
 	return
+}
+
+// IsEmpty assess the variable is empty or not
+func (r Ref) IsEmpty() bool {
+	return r.Name == ""
 }

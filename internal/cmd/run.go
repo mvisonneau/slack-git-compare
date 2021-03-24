@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mvisonneau/slack-git-compare/pkg/slack"
+	"github.com/mvisonneau/slack-git-compare/pkg/controller"
 
 	"github.com/felixge/httpsnoop"
 	"github.com/gorilla/mux"
@@ -17,7 +17,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func getHTTPServer(listenAddress string, s slack.Slack) *http.Server {
+func getHTTPServer(listenAddress string, c controller.Controller) *http.Server {
 	router := mux.NewRouter()
 	loggerRouter := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		m := httpsnoop.CaptureMetrics(router, w, r)
@@ -42,9 +42,9 @@ func getHTTPServer(listenAddress string, s slack.Slack) *http.Server {
 	router.HandleFunc("/health/ready", health.ReadyEndpoint)
 
 	// main endpoint
-	router.HandleFunc("/slack/slash", s.SlashHandler)
-	router.HandleFunc("/slack/modal", s.ModalHandler)
-	router.HandleFunc("/slack/select", s.SelectHandler)
+	router.HandleFunc("/slack/slash", c.SlashHandler)
+	router.HandleFunc("/slack/modal", c.ModalHandler)
+	router.HandleFunc("/slack/select", c.SelectHandler)
 
 	return &http.Server{
 		Addr:    listenAddress,
@@ -55,8 +55,7 @@ func getHTTPServer(listenAddress string, s slack.Slack) *http.Server {
 // Run launches the exporter
 func Run(cliContext *cli.Context) (int, error) {
 	cfg := configure(cliContext)
-	ctx := context.TODO()
-	s, err := slack.New(ctx, cfg.Slack, cfg.Providers, cfg.Users)
+	c, err := controller.New(context.Background(), cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +65,7 @@ func Run(cliContext *cli.Context) (int, error) {
 	signal.Notify(onShutdown, syscall.SIGINT, syscall.SIGTERM, syscall.SIGABRT)
 
 	// HTTP server
-	srv := getHTTPServer(cfg.ListenAddress, s)
+	srv := getHTTPServer(cfg.ListenAddress, c)
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)

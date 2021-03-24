@@ -26,13 +26,13 @@ func TestRefsGetByKey(t *testing.T) {
 		Type: RefTypeBranch,
 	}
 	rs := make(Refs)
-	rs[r.Key()] = &r
+	rs[r.Key()] = r
 
 	foundRef, ok := rs.GetByKey(r.Key())
 	assert.True(t, ok)
-	assert.Equal(t, &r, foundRef)
+	assert.Equal(t, r, foundRef)
 
 	foundRef, ok = rs.GetByKey(Ref{}.Key())
 	assert.False(t, ok)
-	assert.Nil(t, foundRef)
+	assert.Equal(t, Ref{}, foundRef)
 }

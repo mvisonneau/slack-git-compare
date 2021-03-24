@@ -12,9 +12,9 @@ import (
 // Repository holds details of a git repository
 type Repository struct {
 	ProviderType   ProviderType
-	Refs           Refs
 	Name           string
-	LastRefsUpdate time.Time
+	Refs           Refs
+	RefsLastUpdate time.Time
 	WebURL         string
 }
 
@@ -28,12 +28,12 @@ func (r Repository) Key() RepositoryKey {
 }
 
 // Repositories holds multiple Repository with their unique identifiers (RepositoryKey)
-type Repositories map[RepositoryKey]*Repository
+type Repositories map[RepositoryKey]Repository
 
 // RankedRepository can be used when fuzzy searching Repositories, attributing a "rank"
 // for the Repository given the pertinence of its attributes given the search
 type RankedRepository struct {
-	*Repository
+	Repository
 	Rank int
 }
 
@@ -41,7 +41,7 @@ type RankedRepository struct {
 type RankedRepositories []*RankedRepository
 
 // GetByKey returns a Repository given its RepositoryKey
-func (rs Repositories) GetByKey(k RepositoryKey) (r *Repository, ok bool) {
+func (rs Repositories) GetByKey(k RepositoryKey) (r Repository, ok bool) {
 	r, ok = rs[k]
 	return
 }
@@ -79,7 +79,7 @@ func (rs Repositories) Search(filter string, limit int) (repos RankedRepositorie
 
 // GetByClosestNameMatch returns the Repository which is the most pertinent
 // given its Name
-func (rs Repositories) GetByClosestNameMatch(name string) (repo *Repository) {
+func (rs Repositories) GetByClosestNameMatch(name string) (repo Repository) {
 	if len(name) == 0 {
 		return
 	}
@@ -89,4 +89,9 @@ func (rs Repositories) GetByClosestNameMatch(name string) (repo *Repository) {
 		break
 	}
 	return
+}
+
+// IsEmpty assess the variable is empty or not
+func (r Repository) IsEmpty() bool {
+	return r.Name == ""
 }

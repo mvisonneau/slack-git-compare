@@ -10,6 +10,7 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 ### Added
 
 - Capability to map slack users and git authors for an enhanced experience
+- Possibility to refresh the cached repositories and refs list from the modal
 
 ### Changed
 

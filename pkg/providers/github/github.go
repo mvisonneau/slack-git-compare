@@ -83,7 +83,7 @@ func (p Provider) ListRepositories() (repos providers.Repositories, err error) {
 			}
 
 			for _, repo := range fetchedRepos {
-				r := &providers.Repository{
+				r := providers.Repository{
 					ProviderType: providers.ProviderTypeGitHub,
 					Name:         *repo.FullName,
 					WebURL:       *repo.URL,
@@ -184,7 +184,7 @@ func (p Provider) ListRepositoryBranches(owner, repo string) (refs providers.Ref
 		}
 
 		for _, branch := range foundBranches {
-			ref := &providers.Ref{
+			ref := providers.Ref{
 				Name: *branch.Name,
 				Type: providers.RefTypeBranch,
 				// TODO: compute something more pertinent
@@ -220,7 +220,7 @@ func (p *Provider) ListRepositoryTags(owner, repo string) (refs providers.Refs, 
 		}
 
 		for _, tag := range foundTags {
-			ref := &providers.Ref{
+			ref := providers.Ref{
 				Name: *tag.Name,
 				Type: providers.RefTypeTag,
 				// TODO: Provide the correct URL

@@ -19,13 +19,13 @@ func TestRepositoriesGetByKey(t *testing.T) {
 		ProviderType: ProviderTypeGitHub,
 	}
 	rs := make(Repositories)
-	rs[r.Key()] = &r
+	rs[r.Key()] = r
 
 	foundRepository, ok := rs.GetByKey(r.Key())
 	assert.True(t, ok)
-	assert.Equal(t, &r, foundRepository)
+	assert.Equal(t, r, foundRepository)
 
 	foundRepository, ok = rs.GetByKey(Repository{}.Key())
 	assert.False(t, ok)
-	assert.Nil(t, foundRepository)
+	assert.Equal(t, Repository{}, foundRepository)
 }

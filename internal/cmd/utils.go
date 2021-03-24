@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	stdlibLog "log"
 	"os"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/mvisonneau/slack-git-compare/pkg/config"
 	"github.com/mvisonneau/slack-git-compare/pkg/providers"
 	"github.com/urfave/cli/v2"
+	"github.com/vmihailenco/taskq/v3"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -37,6 +39,9 @@ func configure(ctx *cli.Context) config.Config {
 	}); err != nil {
 		log.WithError(err).Fatal("invalid logging config")
 	}
+
+	// This hack is to embed taskq logs with logrus
+	taskq.SetLogger(stdlibLog.New(log.StandardLogger().WriterLevel(log.WarnLevel), "taskq", 0))
 
 	return cfg
 }

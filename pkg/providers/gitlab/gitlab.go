@@ -77,7 +77,7 @@ func (p Provider) ListRepositories() (repos providers.Repositories, err error) {
 			}
 
 			for _, repo := range fetchedRepos {
-				r := &providers.Repository{
+				r := providers.Repository{
 					ProviderType: providers.ProviderTypeGitLab,
 					Name:         repo.PathWithNamespace,
 					WebURL:       repo.WebURL,
@@ -188,7 +188,7 @@ func (p Provider) ListProjectBranches(projectName string) (refs providers.Refs, 
 		}
 
 		for _, branch := range foundBranches {
-			ref := &providers.Ref{
+			ref := providers.Ref{
 				Name:   branch.Name,
 				Type:   providers.RefTypeBranch,
 				WebURL: branch.WebURL,
@@ -225,7 +225,7 @@ func (p *Provider) ListProjectTags(projectName string) (refs providers.Refs, err
 		}
 
 		for _, tag := range foundTags {
-			ref := &providers.Ref{
+			ref := providers.Ref{
 				Name: tag.Name,
 				Type: providers.RefTypeTag,
 				// TODO: Provide the correct URL
@@ -269,7 +269,7 @@ func (p *Provider) ListProjectEnvironments(project string) (refs providers.Refs,
 				}
 
 				if envDetails.LastDeployment != nil && envDetails.LastDeployment.Deployable.Commit != nil {
-					ref := &providers.Ref{
+					ref := providers.Ref{
 						Name: env.Name,
 						Type: providers.RefTypeEnvironment,
 						// TODO: Provide the correct URL
