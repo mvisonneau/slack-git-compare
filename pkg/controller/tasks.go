@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/mvisonneau/slack-git-compare/pkg/providers"
@@ -56,9 +57,13 @@ func NewTaskController() (t TaskController) {
 
 // TaskHandlerRepositoriesUpdate updates the local store with repositories fetched from
 // configured git providers
-func (c *Controller) TaskHandlerRepositoriesUpdate() (err error) {
-	if c.Store.GetRepositoriesLastUpdate().Add(2*time.Minute).Unix() > time.Now().Unix() {
-		log.Debug("repositories updated less than 2 minutes ago, skipping..")
+func (c *Controller) TaskHandlerRepositoriesUpdate(wg *sync.WaitGroup) (err error) {
+	if wg != nil {
+		defer wg.Done()
+	}
+
+	if c.Store.GetRepositoriesLastUpdate().Add(time.Minute).Unix() > time.Now().Unix() {
+		log.Debug("repositories updated less than a minute ago, skipping..")
 		return
 	}
 
@@ -74,14 +79,18 @@ func (c *Controller) TaskHandlerRepositoriesUpdate() (err error) {
 
 // TaskHandlerRepositoryRefsUpdate updates a Repository in the local store with refs fetched from
 // its associated git provider
-func (c *Controller) TaskHandlerRepositoryRefsUpdate(rk providers.RepositoryKey) (err error) {
+func (c *Controller) TaskHandlerRepositoryRefsUpdate(rk providers.RepositoryKey, wg *sync.WaitGroup) (err error) {
+	if wg != nil {
+		defer wg.Done()
+	}
+
 	r, found := c.Store.GetRepository(rk)
 	if !found {
 		return fmt.Errorf("repository key '%s' not found in store", rk)
 	}
 
-	if r.RefsLastUpdate.Add(2*time.Minute).Unix() > time.Now().Unix() {
-		log.Debug("refs updated less than 2 minutes ago, skipping..")
+	if r.RefsLastUpdate.Add(time.Minute).Unix() > time.Now().Unix() {
+		log.Debug("refs updated less than a minute ago, skipping..")
 		return
 	}
 
@@ -101,9 +110,13 @@ func (c *Controller) TaskHandlerRepositoryRefsUpdate(rk providers.RepositoryKey)
 
 // TaskHandlerSlackUsersEmailsUpdate updates the local store with slack users emails fetched from
 // the Slack API and local configuration (for custom aliases)
-func (c *Controller) TaskHandlerSlackUsersEmailsUpdate() (err error) {
-	if c.Store.GetSlackUsersEmailsLastUpdate().Add(2*time.Minute).Unix() > time.Now().Unix() {
-		log.Debug("slack users emails updated less than 2 minutes ago, skipping..")
+func (c *Controller) TaskHandlerSlackUsersEmailsUpdate(wg *sync.WaitGroup) (err error) {
+	if wg != nil {
+		defer wg.Done()
+	}
+
+	if c.Store.GetSlackUsersEmailsLastUpdate().Add(time.Minute).Unix() > time.Now().Unix() {
+		log.Debug("slack users emails updated less than a minute ago, skipping..")
 		return
 	}
 

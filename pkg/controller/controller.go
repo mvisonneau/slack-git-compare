@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/mvisonneau/slack-git-compare/pkg/config"
 	"github.com/mvisonneau/slack-git-compare/pkg/providers"
@@ -51,8 +52,11 @@ func New(ctx context.Context, cfg config.Config) (c Controller, err error) {
 	})
 
 	// Initialize local dataset
-	c.ScheduleTask(TaskTypeRepositoriesUpdate)
-	c.ScheduleTask(TaskTypeSlackUsersEmailsUpdate)
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	c.ScheduleTask(TaskTypeRepositoriesUpdate, &wg)
+	c.ScheduleTask(TaskTypeSlackUsersEmailsUpdate, &wg)
+	wg.Wait()
 
 	return
 }

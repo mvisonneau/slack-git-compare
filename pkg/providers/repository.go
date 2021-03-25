@@ -11,11 +11,12 @@ import (
 
 // Repository holds details of a git repository
 type Repository struct {
-	ProviderType   ProviderType
-	Name           string
-	Refs           Refs
-	RefsLastUpdate time.Time
-	WebURL         string
+	ProviderType          ProviderType
+	Name                  string
+	Refs                  Refs
+	RefsLastUpdate        time.Time
+	RefsCurrentlyUpdating bool
+	WebURL                string
 }
 
 // RepositoryKey is a unique identifier for a Repository

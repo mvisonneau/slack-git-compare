@@ -47,8 +47,8 @@ func (c Comparison) CommitCount() uint {
 // ShortMessage truncates commit messages down to 80 chars
 // and omits return carriages
 func (c Commit) ShortMessage() string {
-	if len(c.Message) > 80 {
-		c.Message = c.Message[:80] + "..."
+	if len(c.Message) > 75 {
+		c.Message = c.Message[:73] + ".."
 	}
 
 	if i := strings.Index(c.Message, "\n"); i != -1 {

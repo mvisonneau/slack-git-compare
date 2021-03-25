@@ -60,8 +60,8 @@ func (s *Store) UpdateRepository(r providers.Repository) {
 
 // GetRepository ..
 func (s *Store) GetRepository(rk providers.RepositoryKey) (r providers.Repository, found bool) {
-	s.repositoriesMutex.Lock()
-	defer s.repositoriesMutex.Unlock()
+	s.repositoriesMutex.RLock()
+	defer s.repositoriesMutex.RUnlock()
 	r, found = s.repositories[rk]
 	return
 }
