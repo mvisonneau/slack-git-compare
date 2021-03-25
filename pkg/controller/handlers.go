@@ -220,7 +220,7 @@ func (c Controller) ModalHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			resp, _ := json.Marshal(vsr)
-			w.Write(resp)
+			_, _ = w.Write(resp)
 			return
 		}
 
@@ -236,7 +236,7 @@ func (c Controller) ModalHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	default:
-		log.Warning("unsupported interaction type '%s'", i.Type)
+		log.Warningf("unsupported interaction type '%v'", i.Type)
 	}
 }
 

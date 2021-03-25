@@ -11,11 +11,7 @@ import (
 	"github.com/xeonx/timeago"
 )
 
-type ViewSubmissionResponse struct {
-	ResponseType string            `json:"response_type"`
-	Errors       map[string]string `json:"errors,omitempty"`
-}
-
+// ModalRequestOptions ..
 type ModalRequestOptions struct {
 	ConversationID                  string
 	Repository                      providers.Repository
@@ -25,6 +21,12 @@ type ModalRequestOptions struct {
 	LastRepositoriesUpdate          time.Time
 	CurrentlyUpdatingRepositories   bool
 	CurrentlyUpdatingRepositoryRefs bool
+}
+
+// ViewSubmissionResponse ..
+type ViewSubmissionResponse struct {
+	ResponseType string            `json:"response_type"`
+	Errors       map[string]string `json:"errors,omitempty"`
 }
 
 // GetModalRequest ..
