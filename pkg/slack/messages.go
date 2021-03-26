@@ -87,7 +87,7 @@ func GetModalRequest(opts ModalRequestOptions) (mvr slack.ModalViewRequest) {
 		// Add a divider
 		mvr.Blocks.BlockSet = append(mvr.Blocks.BlockSet, slack.NewDividerBlock())
 
-		if !opts.Repository.RefsLastUpdate.IsZero() {
+		if !opts.Repository.RefsLastUpdate.IsZero() && !opts.CurrentlyUpdatingRepositoryRefs {
 			// FROM REF
 			fromRefElement := slack.NewOptionsSelectBlockElement(slack.OptTypeExternal, nil, fmt.Sprintf("from_ref/%s", string(opts.Repository.Key())))
 			fromRefElement.MinQueryLength = pointy.Int(0)
