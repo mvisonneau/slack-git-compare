@@ -43,6 +43,11 @@ func New(ctx context.Context, cfg config.Config) (c Controller, err error) {
 	})
 
 	_, _ = c.TaskController.TaskMap.Register(&taskq.TaskOptions{
+		Name:    string(TaskTypeRepositoriesRefsUpdate),
+		Handler: c.TaskHandlerRepositoriesRefsUpdate,
+	})
+
+	_, _ = c.TaskController.TaskMap.Register(&taskq.TaskOptions{
 		Name:    string(TaskTypeRepositoryRefsUpdate),
 		Handler: c.TaskHandlerRepositoryRefsUpdate,
 	})
