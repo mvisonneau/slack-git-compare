@@ -42,7 +42,7 @@ func NewProvider(ctx context.Context, token, baseURL string, orgs []string) (p P
 
 	// TODO: This is probably not going to work for everyone, I suppose we should
 	// consider adding a new/dedicated flag
-	p.webBaseURL = strings.Replace(baseURL, "api.", "", -1)
+	p.webBaseURL = strings.Replace(p.client.BaseURL.String(), "api.", "", -1)
 	return
 }
 

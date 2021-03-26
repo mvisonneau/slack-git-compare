@@ -20,20 +20,19 @@ type Provider struct {
 // NewProvider returns a new Provider with a new GitLab client instanciation and
 // associated config
 func NewProvider(token, baseURL string, groups []string) (p Provider, err error) {
-	p.client, err = gitlab.NewClient(
-		token,
-		gitlab.WithBaseURL(baseURL),
-		gitlab.WithoutRetries(),
-	)
-
-	p.groups = groups
-
 	if baseURL != "" {
 		p.webBaseURL = baseURL
 	} else {
 		p.webBaseURL = "https://gitlab.com"
 	}
 
+	p.client, err = gitlab.NewClient(
+		token,
+		gitlab.WithBaseURL(p.webBaseURL),
+		gitlab.WithoutRetries(),
+	)
+
+	p.groups = groups
 	return
 }
 
