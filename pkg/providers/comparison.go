@@ -130,7 +130,7 @@ func (c Comparison) AuthorsSlackString() (out string) {
 		cursor := 0
 		for _, author := range c.GetAuthors() {
 			if cursor > 0 {
-				if cursor == int(c.CommitCount())-1 || cursor == 7 {
+				if cursor == len(c.GetAuthors())-1 || cursor == 7 {
 					out += " and "
 				} else {
 					out += ", "
@@ -138,7 +138,7 @@ func (c Comparison) AuthorsSlackString() (out string) {
 			}
 
 			if cursor == 7 {
-				remainingCount := int(c.CommitCount()) - cursor
+				remainingCount := len(c.GetAuthors()) - cursor
 				out += fmt.Sprintf("%d other", remainingCount)
 				if remainingCount > 1 {
 					out += "s"
