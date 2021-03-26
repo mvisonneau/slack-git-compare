@@ -8,6 +8,24 @@ import (
 
 func TestNewConfig(t *testing.T) {
 	assert.Equal(t, Config{
+		Cache: Cache{
+			Providers: CacheProviders{
+				UpdateRepositories: CacheProvidersUpdateRepositories{
+					OnStart:      true,
+					EverySeconds: 3600,
+				},
+				UpdateRepositoriesRefs: CacheProvidersUpdateRepositoriesRefs{
+					OnStart:      false,
+					EverySeconds: 0,
+				},
+			},
+			Slack: CacheSlack{
+				UpdateUsersEmails: CacheSlackUpdateUsersEmails{
+					OnStart:      true,
+					EverySeconds: 86400,
+				},
+			},
+		},
 		ListenAddress: ":8080",
 		Log: Log{
 			Level:  "info",

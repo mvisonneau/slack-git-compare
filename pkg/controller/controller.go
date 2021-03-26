@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/mvisonneau/slack-git-compare/pkg/config"
 	"github.com/mvisonneau/slack-git-compare/pkg/providers"
@@ -51,12 +52,8 @@ func New(ctx context.Context, cfg config.Config) (c Controller, err error) {
 		Handler: c.TaskHandlerSlackUsersEmailsUpdate,
 	})
 
-	// Initialize local dataset
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-	c.ScheduleTask(TaskTypeRepositoriesUpdate, &wg)
-	c.ScheduleTask(TaskTypeSlackUsersEmailsUpdate, &wg)
-	wg.Wait()
+	// cache updates
+	c.scheduleCacheUpdateTasks(cfg.Cache)
 
 	return
 }
@@ -105,4 +102,60 @@ func (c Controller) ScheduleTask(tt TaskType, args ...interface{}) {
 	if err := c.TaskController.Queue.Add(msg); err != nil {
 		log.WithError(err).Warning("scheduling task")
 	}
+}
+
+func (c Controller) scheduleCacheUpdateTasks(cfg config.Cache) {
+	// Initialize local cache
+	go func() {
+		if cfg.Slack.UpdateUsersEmails.OnStart {
+			c.ScheduleTask(TaskTypeSlackUsersEmailsUpdate)
+		}
+
+		wg := sync.WaitGroup{}
+		if cfg.Providers.UpdateRepositories.OnStart {
+			wg.Add(1)
+			c.ScheduleTask(TaskTypeRepositoriesUpdate, &wg)
+		}
+
+		if cfg.Providers.UpdateRepositoriesRefs.OnStart {
+			wg.Wait()
+			c.ScheduleTask(TaskTypeRepositoriesRefsUpdate)
+		}
+	}()
+
+	c.scheduleCacheUpdateTaskWithTicker(TaskTypeSlackUsersEmailsUpdate, cfg.Slack.UpdateUsersEmails.EverySeconds)
+	c.scheduleCacheUpdateTaskWithTicker(TaskTypeRepositoriesUpdate, cfg.Providers.UpdateRepositories.EverySeconds)
+	c.scheduleCacheUpdateTaskWithTicker(TaskTypeRepositoriesRefsUpdate, cfg.Providers.UpdateRepositoriesRefs.EverySeconds)
+}
+
+func (c Controller) scheduleCacheUpdateTaskWithTicker(tt TaskType, interval int) {
+	if interval <= 0 {
+		log.WithField("task", tt).Info("task scheduling disabled")
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"task":             tt,
+		"interval_seconds": interval,
+	}).Info("task scheduled")
+
+	go func(ctx context.Context) {
+		ticker := time.NewTicker(time.Duration(interval) * time.Second)
+		for {
+			select {
+			case <-ctx.Done():
+				log.WithField("task", tt).Info("scheduling of task stopped")
+				return
+			case <-ticker.C:
+				switch tt {
+				case TaskTypeRepositoriesUpdate:
+					wg := sync.WaitGroup{}
+					wg.Add(1)
+					c.ScheduleTask(tt, &wg)
+				default:
+					c.ScheduleTask(tt)
+				}
+			}
+		}
+	}(c.Context)
 }

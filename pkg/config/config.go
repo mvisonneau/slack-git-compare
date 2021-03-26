@@ -7,6 +7,41 @@ import (
 
 var validate *validator.Validate
 
+// Cache holds the configuration regarding the scheduling of cache updates
+type Cache struct {
+	Providers CacheProviders
+	Slack     CacheSlack
+}
+
+// CacheProviders ..
+type CacheProviders struct {
+	UpdateRepositories     CacheProvidersUpdateRepositories     `json:"update_repositories" yaml:"update_repositories"`
+	UpdateRepositoriesRefs CacheProvidersUpdateRepositoriesRefs `json:"update_repositories_refs" yaml:"update_repositories_refs"`
+}
+
+// CacheSlack ..
+type CacheSlack struct {
+	UpdateUsersEmails CacheSlackUpdateUsersEmails `json:"update_users_emails" yaml:"update_users_emails"`
+}
+
+// CacheProvidersUpdateRepositories ..
+type CacheProvidersUpdateRepositories struct {
+	OnStart      bool `default:"true" json:"on_start" yaml:"on_start"`
+	EverySeconds int  `default:"3600" json:"every_seconds" yaml:"on_schedule"`
+}
+
+// CacheProvidersUpdateRepositoriesRefs ..
+type CacheProvidersUpdateRepositoriesRefs struct {
+	OnStart      bool `default:"false" json:"on_start" yaml:"on_start"`
+	EverySeconds int  `json:"every_seconds" yaml:"on_schedule"`
+}
+
+// CacheSlackUpdateUsersEmails ..
+type CacheSlackUpdateUsersEmails struct {
+	OnStart      bool `default:"true" json:"on_start" yaml:"on_start"`
+	EverySeconds int  `default:"86400" json:"every_seconds" yaml:"on_schedule"`
+}
+
 // Provider holds the configuration of a git provider
 type Provider struct {
 	Type   string `validate:"oneof=github gitlab"`
@@ -41,6 +76,7 @@ type Users []User
 
 // Config represents all the parameters required for the app to be configured properly
 type Config struct {
+	Cache         Cache
 	Providers     Providers `validate:"gt=0,unique=Type"`
 	ListenAddress string    `default:":8080" validate:"required"`
 	Log           Log

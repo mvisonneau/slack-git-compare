@@ -1,4 +1,26 @@
 {
+  "cache": {
+    "providers": {
+      "update_repositories": {
+        "every_seconds": 3600,
+        "on_start": true
+      },
+      "update_repositories_refs": {
+        "every_seconds": 0,
+        "on_start": false
+      }
+    },
+    "slack": {
+      "update_users_emails": {
+        "every_seconds": 86400,
+        "on_start": true
+      }
+    }
+  },
+  "log": {
+    "format": "text",
+    "level": "debug"
+  },
   "providers": [
     {
       "owners": [

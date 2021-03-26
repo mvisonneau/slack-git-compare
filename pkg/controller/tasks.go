@@ -26,6 +26,10 @@ const (
 	// configured git providers
 	TaskTypeRepositoriesUpdate TaskType = "RepositoriesUpdate"
 
+	// TaskTypeRepositoriesRefsUpdate updates all Repositories in the local store with refs fetched from
+	// their associated git provider
+	TaskTypeRepositoriesRefsUpdate TaskType = "RepositoriesRefsUpdate"
+
 	// TaskTypeRepositoryRefsUpdate updates a Repository in the local store with refs fetched from
 	// its associated git provider
 	TaskTypeRepositoryRefsUpdate TaskType = "RepositoryRefsUpdate"
@@ -77,9 +81,33 @@ func (c *Controller) TaskHandlerRepositoriesUpdate(wg *sync.WaitGroup) (err erro
 	return
 }
 
+// TaskHandlerRepositoriesRefsUpdate updates all Repositories in the local store with refs fetched from
+// its associated git provider
+func (c *Controller) TaskHandlerRepositoriesRefsUpdate() (err error) {
+	for _, r := range c.Store.GetRepositories() {
+		if r.RefsLastUpdate.Add(time.Minute).Unix() > time.Now().Unix() {
+			log.Debug("refs updated less than a minute ago, skipping..")
+			continue
+		}
+
+		r.Refs, err = c.Providers[r.ProviderType].ListRefs(r.Name)
+		if err != nil {
+			return
+		}
+		r.RefsLastUpdate = time.Now()
+		c.Store.UpdateRepository(r)
+		log.WithFields(log.Fields{
+			"repository_provider": r.ProviderType,
+			"repository_name":     r.Name,
+		}).Info("updated repo refs list!")
+	}
+
+	return
+}
+
 // TaskHandlerRepositoryRefsUpdate updates a Repository in the local store with refs fetched from
 // its associated git provider
-func (c *Controller) TaskHandlerRepositoryRefsUpdate(rk providers.RepositoryKey, wg *sync.WaitGroup) (err error) {
+func (c *Controller) TaskHandlerRepositoryRefsUpdate(wg *sync.WaitGroup, rk providers.RepositoryKey) (err error) {
 	if wg != nil {
 		defer wg.Done()
 	}
@@ -110,11 +138,7 @@ func (c *Controller) TaskHandlerRepositoryRefsUpdate(rk providers.RepositoryKey,
 
 // TaskHandlerSlackUsersEmailsUpdate updates the local store with slack users emails fetched from
 // the Slack API and local configuration (for custom aliases)
-func (c *Controller) TaskHandlerSlackUsersEmailsUpdate(wg *sync.WaitGroup) (err error) {
-	if wg != nil {
-		defer wg.Done()
-	}
-
+func (c *Controller) TaskHandlerSlackUsersEmailsUpdate() (err error) {
 	if c.Store.GetSlackUsersEmailsLastUpdate().Add(time.Minute).Unix() > time.Now().Unix() {
 		log.Debug("slack users emails updated less than a minute ago, skipping..")
 		return
