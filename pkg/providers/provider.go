@@ -54,7 +54,7 @@ func (ps Providers) ListRepositories() (repos Repositories, err error) {
 		}
 
 		log.WithFields(log.Fields{
-			"provider": p.Type(),
+			"provider": p.Type().String(),
 			"count":    len(foundRepos),
 		}).Info("fetched repositories from provider")
 	}
