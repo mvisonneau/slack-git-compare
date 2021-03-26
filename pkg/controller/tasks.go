@@ -61,7 +61,7 @@ func NewTaskController() (t TaskController) {
 
 // TaskHandlerRepositoriesUpdate updates the local store with repositories fetched from
 // configured git providers
-func (c *Controller) TaskHandlerRepositoriesUpdate(wg *sync.WaitGroup) (err error) {
+func (c *Controller) TaskHandlerRepositoriesUpdate(wg *sync.WaitGroup) {
 	if wg != nil {
 		defer wg.Done()
 	}
@@ -73,7 +73,8 @@ func (c *Controller) TaskHandlerRepositoriesUpdate(wg *sync.WaitGroup) (err erro
 
 	repos, err := c.Providers.ListRepositories()
 	if err != nil {
-		return err
+		log.WithError(err).Warning("executing 'RepositoriesUpdate' task")
+		return
 	}
 
 	c.Store.UpdateRepositories(repos)
@@ -83,17 +84,15 @@ func (c *Controller) TaskHandlerRepositoriesUpdate(wg *sync.WaitGroup) (err erro
 
 // TaskHandlerRepositoriesRefsUpdate updates all Repositories in the local store with refs fetched from
 // its associated git provider
-func (c *Controller) TaskHandlerRepositoriesRefsUpdate() (err error) {
+func (c *Controller) TaskHandlerRepositoriesRefsUpdate() {
 	for _, r := range c.Store.GetRepositories() {
-		if r.RefsLastUpdate.Add(time.Minute).Unix() > time.Now().Unix() {
-			log.Debug("refs updated less than a minute ago, skipping..")
-			continue
-		}
-
+		var err error
 		r.Refs, err = c.Providers[r.ProviderType].ListRefs(r.Name)
 		if err != nil {
+			log.WithError(err).Warning("executing 'RepositoriesRefsUpdate' task")
 			return
 		}
+
 		r.RefsLastUpdate = time.Now()
 		c.Store.UpdateRepository(r)
 		log.WithFields(log.Fields{
@@ -107,14 +106,16 @@ func (c *Controller) TaskHandlerRepositoriesRefsUpdate() (err error) {
 
 // TaskHandlerRepositoryRefsUpdate updates a Repository in the local store with refs fetched from
 // its associated git provider
-func (c *Controller) TaskHandlerRepositoryRefsUpdate(wg *sync.WaitGroup, rk providers.RepositoryKey) (err error) {
+func (c *Controller) TaskHandlerRepositoryRefsUpdate(wg *sync.WaitGroup, rk providers.RepositoryKey) {
 	if wg != nil {
 		defer wg.Done()
 	}
 
 	r, found := c.Store.GetRepository(rk)
 	if !found {
-		return fmt.Errorf("repository key '%s' not found in store", rk)
+		err := fmt.Errorf("repository key '%s' not found in store", rk)
+		log.WithError(err).WithField("repository_key", rk).Warning("executing 'RepositoryRefsUpdate' task")
+		return
 	}
 
 	if r.RefsLastUpdate.Add(time.Minute).Unix() > time.Now().Unix() {
@@ -122,8 +123,13 @@ func (c *Controller) TaskHandlerRepositoryRefsUpdate(wg *sync.WaitGroup, rk prov
 		return
 	}
 
+	var err error
 	r.Refs, err = c.Providers[r.ProviderType].ListRefs(r.Name)
 	if err != nil {
+		log.WithError(err).WithFields(log.Fields{
+			"repository_provider": r.ProviderType,
+			"repository_name":     r.Name,
+		}).Warning("executing 'RepositoryRefsUpdate' task")
 		return
 	}
 	r.RefsLastUpdate = time.Now()
@@ -138,7 +144,7 @@ func (c *Controller) TaskHandlerRepositoryRefsUpdate(wg *sync.WaitGroup, rk prov
 
 // TaskHandlerSlackUsersEmailsUpdate updates the local store with slack users emails fetched from
 // the Slack API and local configuration (for custom aliases)
-func (c *Controller) TaskHandlerSlackUsersEmailsUpdate() (err error) {
+func (c *Controller) TaskHandlerSlackUsersEmailsUpdate() {
 	if c.Store.GetSlackUsersEmailsLastUpdate().Add(time.Minute).Unix() > time.Now().Unix() {
 		log.Debug("slack users emails updated less than a minute ago, skipping..")
 		return
@@ -146,7 +152,8 @@ func (c *Controller) TaskHandlerSlackUsersEmailsUpdate() (err error) {
 
 	sue, err := c.Slack.ListSlackUserEmailMappings()
 	if err != nil {
-		return err
+		log.WithError(err).Warning("executing 'SlackUsersEmailsUpdate' task")
+		return
 	}
 
 	c.Store.UpdateSlackUsersEmails(sue)
