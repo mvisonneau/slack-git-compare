@@ -319,7 +319,7 @@ func (c Controller) handleRequiredDataFetchesAndUpdateModalAfterCompletion(viewI
 		go func() {
 			wg := sync.WaitGroup{}
 			wg.Add(1)
-			c.ScheduleTask(TaskTypeRepositoryRefsUpdate, opts.Repository.Key(), &wg)
+			c.ScheduleTask(TaskTypeRepositoryRefsUpdate, &wg, opts.Repository.Key())
 			wg.Wait()
 
 			opts.CurrentlyUpdatingRepositoryRefs = false
