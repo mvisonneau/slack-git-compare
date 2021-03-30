@@ -247,8 +247,10 @@ func (p *Provider) ListProjectTags(projectName string) (refs providers.Refs, err
 func (p *Provider) ListProjectEnvironments(project string) (refs providers.Refs, err error) {
 	refs = make(providers.Refs)
 	opts := &gitlab.ListEnvironmentsOptions{
-		Page:    1,
-		PerPage: 100,
+		ListOptions: gitlab.ListOptions{
+			Page:    1,
+			PerPage: 100,
+		},
 	}
 
 	for {

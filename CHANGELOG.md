@@ -7,6 +7,10 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 
 ## [Unreleased]
 
+### Changed
+
+- Updated all gomodules
+
 ## [v0.1.0] - 2021-03-30
 
 ### Added
