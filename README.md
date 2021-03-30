@@ -9,6 +9,8 @@
 
 This is a slack command handler to compare git refs from whether `GitHub` or `GitLab`, within **Slack**
 
+![demo](/docs/images/demo.gif)
+
 ## How it works
 
 This repositories holds the code of a daemon which communicates with git providers and can handle Slack interactions.
