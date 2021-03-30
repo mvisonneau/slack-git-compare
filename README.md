@@ -17,11 +17,6 @@ This repositories holds the code of a daemon which communicates with git provide
 
 ![architecture](/docs/images/architecture.png)
 
-## Limitations / Known issues
-
-- For readability purposes, we currently only display up to 10 commits info per diff
-- On repositories with large amount of references, API calls may not be returned in less than 3s which causes Slack to dismiss the response.
-
 ## Install
 
 ### Go
@@ -93,20 +88,17 @@ You can check the chart's [values.yml](https://github.com/mvisonneau/helm-charts
 # only one of github/gitlab needs to be configured
 ~$ cat <<EOF > values.yml
 config:
-  github:
-    url: 'https://api.github.com/'
-    token: '<your-github-token>'
-    orgs: '<your-github-orgs (comma separated)>'
-
-  gitlab:
-    url: 'https://gitlab.com'
-    token: '<your-gitlab-token>'
-    groups: '<your-gitlab-groups (comma separated)>'
+  providers:
+    - type: github
+      token: <your-github-token>
+      owners: [ <your-github-orgs> ]
+    - type: gitlab
+      token: <your-gitlab-token>
+      owners: [ <your-gitlab-groups> ]
 
   slack:
     token: '<your-slack-token>'
     signing-secret: '<your-slack-signing-secret>'
-
 EOF
 
 # Release the chart on your Kubernetes cluster
@@ -116,6 +108,14 @@ EOF
 ## Examples / Getting Started
 
 Here is documentation about [how to get started](examples/quickstart) with the tool.
+
+## Limitations / Known issues
+
+- For readability purposes, we currently only display up to 15 commits and 7 authors per diff
+- As we cache refs, it is not possible to use a commit SHA as ref, solely:
+  - branch
+  - tag
+  - environment (GitLab only)
 
 ## Usage
 

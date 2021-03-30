@@ -7,6 +7,8 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 
 ## [Unreleased]
 
+## [v0.1.0] - 2021-03-30
+
 ### Added
 
 - Map slack users and git authors for an enhanced experience
@@ -30,5 +32,6 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 - Some tests
 - CI and project boilerplating
 
-[Unreleased]: https://github.com/mvisonneau/slack-git-compare/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/mvisonneau/slack-git-compare/compare/v0.1.0...HEAD
+[v0.1.0]: https://github.com/mvisonneau/slack-git-compare/tree/v0.1.0
 [v0.0.1]: https://github.com/mvisonneau/slack-git-compare/tree/v0.0.1
