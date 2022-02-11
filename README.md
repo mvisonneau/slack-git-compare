@@ -22,7 +22,7 @@ This repositories holds the code of a daemon which communicates with git provide
 ### Go
 
 ```bash
-~$ go get -u github.com/mvisonneau/slack-git-compare/cmd/slack-git-compare
+~$ go install github.com/mvisonneau/slack-git-compare/cmd/slack-git-compare@latest
 ```
 
 ### Snapcraft
@@ -41,8 +41,8 @@ This repositories holds the code of a daemon which communicates with git provide
 
 ```bash
 ~$ docker run -it --rm docker.io/mvisonneau/slack-git-compare
-or
 ~$ docker run -it --rm ghcr.io/mvisonneau/slack-git-compare
+~$ docker run -it --rm quay.io/mvisonneau/slack-git-compare
 ```
 
 ### Scoop

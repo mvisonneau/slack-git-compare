@@ -7,8 +7,13 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 
 ## [Unreleased]
 
+### Added
+
+- Release container images to `quay.io`
+
 ### Changed
 
+- Bumped go to `1.17`
 - Updated all gomodules
 
 ## [v0.1.0] - 2021-03-30
