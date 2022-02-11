@@ -7,6 +7,8 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 
 ## [Unreleased]
 
+## [v0.1.1] - 2022-02-11
+
 ### Added
 
 - Release container images to `quay.io`
@@ -41,6 +43,7 @@ and this project adheres to [0ver](https://0ver.org) (more or less).
 - Some tests
 - CI and project boilerplating
 
-[Unreleased]: https://github.com/mvisonneau/slack-git-compare/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/mvisonneau/slack-git-compare/compare/v0.1.1...HEAD
+[v0.1.1]: https://github.com/mvisonneau/slack-git-compare/tree/v0.1.1
 [v0.1.0]: https://github.com/mvisonneau/slack-git-compare/tree/v0.1.0
 [v0.0.1]: https://github.com/mvisonneau/slack-git-compare/tree/v0.0.1
