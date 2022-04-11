@@ -3,7 +3,7 @@ module github.com/mvisonneau/slack-git-compare
 go 1.17
 
 require (
-	github.com/creasty/defaults v1.5.2
+	github.com/creasty/defaults v1.6.0
 	github.com/felixge/httpsnoop v1.0.2
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/google/go-github/v33 v33.0.0
