@@ -9,7 +9,7 @@ require (
 	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/mux v1.8.0
 	github.com/heptiolabs/healthcheck v0.0.0-20211123025425-613501dd5deb
-	github.com/lithammer/fuzzysearch v1.1.3
+	github.com/lithammer/fuzzysearch v1.1.4
 	github.com/mvisonneau/go-helpers v0.0.1
 	github.com/openlyinc/pointy v1.1.2
 	github.com/sirupsen/logrus v1.8.1
