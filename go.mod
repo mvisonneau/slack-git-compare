@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/creasty/defaults v1.5.2
-	github.com/felixge/httpsnoop v1.0.2
+	github.com/felixge/httpsnoop v1.0.3
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/google/go-github/v33 v33.0.0
 	github.com/gorilla/mux v1.8.0
