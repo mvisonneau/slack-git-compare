@@ -15,12 +15,12 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slack-go/slack v0.10.1
 	github.com/stretchr/testify v1.7.0
-	github.com/urfave/cli/v2 v2.3.0
+	github.com/urfave/cli/v2 v2.23.5
 	github.com/vmihailenco/taskq/v3 v3.2.8
 	github.com/xanzy/go-gitlab v0.55.1
 	github.com/xeonx/timeago v1.0.0-rc4
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -28,7 +28,7 @@ require (
 	github.com/bsm/redislock v0.7.2 // indirect
 	github.com/capnm/sysinfo v0.0.0-20130621111458-5909a53897f3 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -55,6 +55,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/crypto v0.0.0-20220210151621-f4118a5b28e2 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
